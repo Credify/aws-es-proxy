@@ -201,7 +201,7 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !p.nosignreq {
 		// AWS credentials expired, need to generate fresh ones
 		// then try again
-		if resp.StatusCode != http.StatusForbidden {
+		if resp.StatusCode == http.StatusForbidden {
 			p.credentials = nil
 
 			// Rewind reader to the begining to start over
