@@ -24,17 +24,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
-<<<<<<< HEAD
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	uuid "github.com/satori/go.uuid"
-=======
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
->>>>>>> abutaha/master
 )
 
 func logger(debug bool) {
@@ -157,9 +154,6 @@ type proxy struct {
 }
 
 func newProxy(args ...interface{}) *proxy {
-
-<<<<<<< HEAD
-=======
 	noRedirect := func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}
@@ -169,7 +163,6 @@ func newProxy(args ...interface{}) *proxy {
 		CheckRedirect: noRedirect,
 	}
 
->>>>>>> abutaha/master
 	return &proxy{
 		endpoint:   args[0].(string),
 		verbose:    args[1].(bool),
@@ -322,7 +315,6 @@ func (p *proxy) forwardRequest(req *http.Request) (*http.Response, error) {
 }
 
 func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-<<<<<<< HEAD
 	defer r.Body.Close()
 
 	requestStarted := time.Now()
@@ -337,7 +329,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-=======
 
 	if p.auth {
 		user, pass, ok := r.BasicAuth()
@@ -364,54 +355,28 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defer r.Body.Close()
->>>>>>> abutaha/master
-
 	proxied := *r.URL
 	proxied.Host = p.host
 	proxied.Scheme = p.scheme
 	proxied.Path = path.Clean(proxied.Path)
 
-<<<<<<< HEAD
-	req, err := http.NewRequest(r.Method, ep.String(), r.Body)
-	if err != nil {
-		log.Printf("error creating new request: %v", err)
-=======
 	if req, err = http.NewRequest(r.Method, proxied.String(), r.Body); err != nil {
 		logrus.WithError(err).Errorln("Failed creating new request.")
->>>>>>> abutaha/master
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	addHeaders(r.Header, req.Header)
 
-<<<<<<< HEAD
 	resp, err := p.forwardRequest(req)
 	if err != nil {
 		log.Printf("Error: %v", err)
-=======
-	// Make signV4 optional
-	if !p.nosignreq {
-		// Start AWS session from ENV, Shared Creds or EC2Role
-		signer := p.getSigner()
-
-		// Sign the request with AWSv4
-		payload := bytes.NewReader(replaceBody(req))
-		signer.Sign(req, payload, p.service, p.region, time.Now())
-	}
-
-	resp, err := p.httpClient.Do(req)
-	if err != nil {
-		logrus.Errorln(err)
->>>>>>> abutaha/master
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if !p.nosignreq {
 		// AWS credentials expired, need to generate fresh ones
-<<<<<<< HEAD
 		// then try again
 		if resp.StatusCode == http.StatusForbidden {
 			p.credentials = nil
@@ -430,21 +395,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-=======
-		if resp.StatusCode == 403 {
-			logrus.Errorln("Received 403 from AWSAuth, invalidating credentials for retrial")
-			p.credentials = nil
-
-			logrus.Debugln("Received Status code from AWS:", resp.StatusCode)
-			b := bytes.Buffer{}
-			if _, err := io.Copy(&b, resp.Body); err != nil {
-				logrus.WithError(err).Errorln("Failed to decode body")
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			logrus.Debugln("Received headers from AWS:", resp.Header)
-			logrus.Debugln("Received body from AWS:", string(b.Bytes()))
->>>>>>> abutaha/master
 		}
 	}
 
@@ -456,7 +406,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var clientResponseBody io.Reader
 	body := bytes.Buffer{}
-<<<<<<< HEAD
 	if p.logtofile {
 		clientResponseBody = io.TeeReader(resp.Body, &body)
 	} else {
@@ -468,16 +417,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error while writing response body: %v", err.Error())
 		return
 	}
-=======
-	if _, err := io.Copy(&body, resp.Body); err != nil {
-		logrus.Errorln(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(resp.StatusCode)
-	w.Write(body.Bytes())
->>>>>>> abutaha/master
 
 	requestEnded := time.Since(requestStarted)
 
@@ -494,7 +433,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		var query string
 
-<<<<<<< HEAD
 		if len(queryEx) == 0 {
 			query = regex.FindString(rawQuery)
 		} else {
@@ -511,7 +449,7 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("========================")
 				fmt.Println(t.Format("2006/01/02 15:04:05"))
 				fmt.Println("Remote Address: ", r.RemoteAddr)
-				fmt.Println("Request URI: ", ep.RequestURI())
+				fmt.Println("Request URI: ", proxied.RequestURI())
 				fmt.Println("Method: ", r.Method)
 				fmt.Println("Status: ", resp.StatusCode)
 				fmt.Printf("Took: %.3fs\n", requestEnded.Seconds())
@@ -520,41 +458,12 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			} else {
 				log.Printf(" -> %s; %s; %s; %s; %d; %.3fs\n",
 					r.Method, r.RemoteAddr,
-					ep.RequestURI(), query,
+					proxied.RequestURI(), query,
 					resp.StatusCode, requestEnded.Seconds())
 			}
-=======
-	if len(queryEx) == 0 {
-		query = regex.FindString(rawQuery)
-	} else {
-		query = ""
-	}
-
-	if p.verbose {
-		if p.prettify {
-			var prettyBody bytes.Buffer
-			json.Indent(&prettyBody, []byte(query), "", "  ")
-			t := time.Now()
-
-			fmt.Println()
-			fmt.Println("========================")
-			fmt.Println(t.Format("2006/01/02 15:04:05"))
-			fmt.Println("Remote Address: ", r.RemoteAddr)
-			fmt.Println("Request URI: ", proxied.RequestURI())
-			fmt.Println("Method: ", r.Method)
-			fmt.Println("Status: ", resp.StatusCode)
-			fmt.Printf("Took: %.3fs\n", requestEnded.Seconds())
-			fmt.Println("Body: ")
-			fmt.Println(string(prettyBody.Bytes()))
-		} else {
-			log.Printf(" -> %s; %s; %s; %s; %d; %.3fs\n",
-				r.Method, r.RemoteAddr,
-				proxied.RequestURI(), query,
-				resp.StatusCode, requestEnded.Seconds())
 		}
-	}
 
-	if p.logtofile {
+		if p.logtofile {
 
 		requestID := primitive.NewObjectID().Hex()
 
@@ -572,7 +481,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		respStruct := &responseStruct{
 			Requestid: requestID,
 			Body:      string(body.Bytes()),
->>>>>>> abutaha/master
 		}
 
 		if p.logtofile {
@@ -724,21 +632,6 @@ func instrumentHandler(metricPrefix string, prometheusConfig *prometheusConfigur
 func main() {
 
 	var (
-<<<<<<< HEAD
-		verbose                 bool
-		prettify                bool
-		logtofile               bool
-		nosignreq               bool
-		endpoint                string
-		listenAddress           string
-		managementListenAddress string
-		fileRequest             *os.File
-		fileResponse            *os.File
-		requestSizeBuckets      string
-		requestDurationBuckets  string
-		responseSizeBuckets     string
-		err                     error
-=======
 		debug         bool
 		auth          bool
 		username      string
@@ -751,11 +644,14 @@ func main() {
 		ver           bool
 		endpoint      string
 		listenAddress string
+		managementListenAddress string
 		fileRequest   *os.File
 		fileResponse  *os.File
+		requestSizeBuckets      string
+		requestDurationBuckets  string
+		responseSizeBuckets     string
 		err           error
 		timeout       int
->>>>>>> abutaha/master
 	)
 
 	flag.StringVar(&endpoint, "endpoint", "", "Amazon ElasticSearch Endpoint (e.g: https://dummy-host.eu-west-1.es.amazonaws.com)")
@@ -765,11 +661,9 @@ func main() {
 	flag.BoolVar(&logtofile, "log-to-file", false, "Log user requests and ElasticSearch responses to files")
 	flag.BoolVar(&prettify, "pretty", false, "Prettify verbose and file output")
 	flag.BoolVar(&nosignreq, "no-sign-reqs", false, "Disable AWS Signature v4")
-<<<<<<< HEAD
 	flag.StringVar(&requestDurationBuckets, "request-duration-buckets", "10ms,50ms,100ms,250ms,500ms,1s,5s", "Prometheus request duration buckets")
 	flag.StringVar(&requestSizeBuckets, "request-size-buckets", "128B,256B,512B,1Kb,2Kb,5Kb,25Kb,100Kb,500Kb,1M,2M,5M", "Prometheus request size buckets")
 	flag.StringVar(&responseSizeBuckets, "response-size-buckets", "128B,256B,512B,1Kb,2Kb,5Kb,25Kb,100Kb,500Kb,1M,2M,5M", "Prometheus response size buckets")
-=======
 	flag.BoolVar(&debug, "debug", false, "Print debug messages")
 	flag.BoolVar(&ver, "version", false, "Print aws-es-proxy version")
 	flag.IntVar(&timeout, "timeout", 15, "Set a request timeout to ES. Specify in seconds, defaults to 15")
@@ -777,7 +671,6 @@ func main() {
 	flag.StringVar(&username, "username", "", "HTTP Basic Auth Username")
 	flag.StringVar(&password, "password", "", "HTTP Basic Auth Password")
 	flag.StringVar(&realm, "realm", "", "Authentication Required")
->>>>>>> abutaha/master
 	flag.Parse()
 
 	if endpoint == "" {
@@ -831,23 +724,11 @@ func main() {
 	}
 
 	if err = p.parseEndpoint(); err != nil {
-<<<<<<< HEAD
-		log.Fatalln(err)
-	}
-
-	if p.logtofile {
-		u1 := uuid.NewV4()
-		u2 := uuid.NewV4()
-		requestFname := fmt.Sprintf("request-%s.log", u1.String())
-		responseFname := fmt.Sprintf("response-%s.log", u2.String())
-=======
 		logrus.Fatalln(err)
 		os.Exit(1)
 	}
 
 	if p.logtofile {
->>>>>>> abutaha/master
-
 		requestFname := fmt.Sprintf("request-%s.log", primitive.NewObjectID().Hex())
 		if fileRequest, err = os.Create(requestFname); err != nil {
 			log.Println(err.Error())
@@ -865,7 +746,6 @@ func main() {
 
 	}
 
-<<<<<<< HEAD
 	go func() {
 		mux := http.NewServeMux()
 		mux.Handle("/metrics", promhttp.Handler())
@@ -876,10 +756,7 @@ func main() {
 		log.Fatal(http.ListenAndServe(managementListenAddress, mux))
 	}()
 
-	log.Printf("Listening on %s...\n", listenAddress)
-	log.Fatal(http.ListenAndServe(listenAddress, instrumentHandler("aws_es_proxy_handler", prometheusConfig, p)))
-=======
+
 	logrus.Infof("Listening on %s...\n", listenAddress)
 	logrus.Fatalln(http.ListenAndServe(listenAddress, p))
->>>>>>> abutaha/master
 }
