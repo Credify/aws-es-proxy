@@ -1,10 +1,6 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-VERSION="0.9"
-=======
 VERSION="1.0"
->>>>>>> abutaha/master
 
 rm -rf dist; mkdir -p dist
 for GOOS in darwin linux windows; do
