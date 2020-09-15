@@ -29,7 +29,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	uuid "github.com/satori/go.uuid"
-	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
