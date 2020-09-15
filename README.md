@@ -16,12 +16,20 @@ Download the latest [aws-es-proxy release](https://github.com/abutaha/aws-es-pro
 
 ### Docker
 
+<<<<<<< HEAD
 There is an official docker image avaiable for aws-es-proxy. To run the image:
+=======
+There is an official docker image available for aws-es-proxy. To run the image:
+>>>>>>> abutaha/master
 
 ```sh
 # v0.9 and newer (latest always point to the latest release):
 
+<<<<<<< HEAD
 docker run --rm -it abutaha/aws-es-proxy:0.9 -endpoint https://dummy-host.ap-southeast-2.es.amazonaws.com
+=======
+docker run --rm -v ~/.aws:/root/.aws -p 9200:9200 abutaha/aws-es-proxy:v1.0 -endpoint https://dummy-host.ap-southeast-2.es.amazonaws.com -listen 0.0.0.0:9200
+>>>>>>> abutaha/master
 
 v.08:
 
@@ -40,18 +48,10 @@ brew install aws-es-proxy
 ### Build from Source
 
 #### Dependencies:
-* go1.5+
-* [glide package manager](https://github.com/Masterminds/glide)
-
+* go1.14+
 
 ```sh
-#requires go1.5
-export GO15VENDOREXPERIMENT=1
-mkdir -p $GOPATH/src/github.com/abutaha
-cd $GOPATH/src/github.com/abutaha
-git clone https://github.com/abutaha/aws-es-proxy
-cd aws-es-proxy
-glide install
+#requires go1.14
 go build github.com/abutaha/aws-es-proxy
 ```
 
@@ -94,9 +94,18 @@ export AWS_SECRET_ACCESS_KEY=MY-SECRET-KEY
 
 ## Usage example:
 
+You can use either argument `-endpoint` OR environment variable `ENDPOINT` to specify AWS ElasticSearch endpoint.
+
 ```sh
 ./aws-es-proxy -endpoint https://test-es-somerandomvalue.eu-west-1.es.amazonaws.com
 Listening on 127.0.0.1:9200
+```
+
+```sh
+export ENDPOINT=https://test-es-somerandomvalue.eu-west-1.es.amazonaws.com
+
+./aws-es-proxy  -listen 10.0.0.1:9200 -verbose
+Listening on 10.0.0.1:9200
 ```
 
 *aws-es-proxy* listens on 127.0.0.1:9200 if no additional argument is provided. You can change the IP and Port passing the argument `-listen`
@@ -142,4 +151,4 @@ Usage of ./aws-es-proxy:
 
 After you run *aws-es-proxy*, you can now open your Web browser on [http://localhost:9200](http://localhost:9200). Everything should be working as you have your own instance of ElasticSearch running on port 9200.
 
-To access Kibana, use [http://localhost:9200/_plugin/kibana/](http://localhost:9200/_plugin/kibana/)
+To access Kibana, use [http://localhost:9200/_plugin/kibana/app/kibana](http://localhost:9200/_plugin/kibana/app/kibana)
