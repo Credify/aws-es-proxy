@@ -16,20 +16,12 @@ Download the latest [aws-es-proxy release](https://github.com/abutaha/aws-es-pro
 
 ### Docker
 
-<<<<<<< HEAD
-There is an official docker image avaiable for aws-es-proxy. To run the image:
-=======
 There is an official docker image available for aws-es-proxy. To run the image:
->>>>>>> abutaha/master
 
 ```sh
 # v0.9 and newer (latest always point to the latest release):
 
-<<<<<<< HEAD
-docker run --rm -it abutaha/aws-es-proxy:0.9 -endpoint https://dummy-host.ap-southeast-2.es.amazonaws.com
-=======
 docker run --rm -v ~/.aws:/root/.aws -p 9200:9200 abutaha/aws-es-proxy:v1.0 -endpoint https://dummy-host.ap-southeast-2.es.amazonaws.com -listen 0.0.0.0:9200
->>>>>>> abutaha/master
 
 v.08:
 
