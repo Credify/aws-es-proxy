@@ -291,7 +291,9 @@ func (p *proxy) forwardRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// Sign the request with AWSv4
-		signer.Sign(req, body, p.service, p.region, time.Now())
+		if _, err := signer.Sign(req, body, p.service, p.region, time.Now()); err != nil {
+			logrus.WithError(err).Debug("could not sign request")
+		}
 	}
 
 	return http.DefaultClient.Do(req)
