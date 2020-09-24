@@ -149,6 +149,7 @@ type proxy struct {
 	username     string
 	password     string
 	realm        string
+	assumeRole   string
 }
 
 func newProxy(args ...interface{}) *proxy {
@@ -173,6 +174,7 @@ func newProxy(args ...interface{}) *proxy {
 		username:   args[7].(string),
 		password:   args[8].(string),
 		realm:      args[9].(string),
+		assumeRole: args[10].(string),
 	}
 }
 
@@ -260,11 +262,11 @@ func (p *proxy) getSigner() *v4.Signer {
 		}
 
 		credentials := sess.Config.Credentials
-		awsRoleARN := os.Getenv("AWS_ROLE_ARN")
-		awsWebIdentityTokenFile := os.Getenv("AWS_WEB_IDENTITY_TOKEN_FILE")
-		if awsRoleARN != "" && awsWebIdentityTokenFile != "" {
-			credentials = stscreds.NewWebIdentityCredentials(sess, awsRoleARN, "", awsWebIdentityTokenFile)
+
+		if p.assumeRole != "" {
+			credentials = stscreds.NewCredentials(sess, p.assumeRole)
 		}
+
 		p.credentials = credentials
 		logrus.Infoln("Generated fresh AWS Credentials object")
 	}
@@ -607,6 +609,7 @@ func main() {
 		responseSizeBuckets     string
 		err                     error
 		timeout                 int
+		assumeRole              string
 	)
 
 	flag.StringVar(&endpoint, "endpoint", "", "Amazon ElasticSearch Endpoint (e.g: https://dummy-host.eu-west-1.es.amazonaws.com)")
@@ -623,6 +626,7 @@ func main() {
 	flag.StringVar(&username, "username", "", "HTTP Basic Auth Username")
 	flag.StringVar(&password, "password", "", "HTTP Basic Auth Password")
 	flag.StringVar(&realm, "realm", "", "Authentication Required")
+	flag.StringVar(&assumeRole, "assume-role", "", "Assume role ARN")
 	flag.StringVar(&requestDurationBuckets, "request-duration-buckets", "10ms,50ms,100ms,250ms,500ms,1s,5s", "Prometheus request duration buckets")
 	flag.StringVar(&requestSizeBuckets, "request-size-buckets", "128B,256B,512B,1Kb,2Kb,5Kb,25Kb,100Kb,500Kb,1M,2M,5M", "Prometheus request size buckets")
 	flag.StringVar(&responseSizeBuckets, "response-size-buckets", "128B,256B,512B,1Kb,2Kb,5Kb,25Kb,100Kb,500Kb,1M,2M,5M", "Prometheus response size buckets")
@@ -671,6 +675,7 @@ func main() {
 		username,
 		password,
 		realm,
+		assumeRole,
 	)
 
 	prometheusConfig, err := newPrometheusConfiguration(requestDurationBuckets, requestSizeBuckets, responseSizeBuckets)
