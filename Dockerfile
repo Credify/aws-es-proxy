@@ -1,11 +1,11 @@
-FROM docker-upgrade.artifactory.build.upgrade.com/go-builder:2.0.20200722.0-212.1.15.2-214 as build
+FROM docker-upgrade.artifactory.build.upgrade.com/go-builder:2.0.20210617.0-15.1.16.5-6 as build
 
 WORKDIR /go/src/github.com/abutaha/aws-es-proxy
-COPY . .
+COPY --chown=upgrade:upgrade . .
 
 RUN GOOS=linux go build -o aws-es-proxy
 
-FROM docker-upgrade.artifactory.build.upgrade.com/container-base:2.0.20200722.0-212
+FROM docker-upgrade.artifactory.build.upgrade.com/container-base:2.0.20210617.0-15
 LABEL name="aws-es-proxy"
 
 COPY --from=build /go/src/github.com/abutaha/aws-es-proxy/aws-es-proxy /usr/local/bin/
