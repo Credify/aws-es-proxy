@@ -7,5 +7,5 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/google/uuid v1.1.2
 	github.com/prometheus/client_golang v1.11.1
-	github.com/sirupsen/logrus v1.6.0
+	github.com/sirupsen/logrus v1.9.0
 )
