@@ -5,12 +5,9 @@
 "deploymentNames": null
 "deploymentOwners": []
 "leads":
-  "teams": []
+  "teams":
+  - "review-devops-leads"
   "users":
-  - "jpbelangerupgrade"
-  - "vmayerupgrade"
-  - "ilevinupgrade"
-  - "pgreidanusupgrade"
   - "leanidmokin"
 "mergebot": null
 "owner": "devops"
