@@ -11,8 +11,9 @@
   - "leanidmokin"
 "mergebot": null
 "owner": "devops"
-"platformOwners": null
-"primaryOwners": []
+"platformOwners": []
+"primaryOwners":
+- "team:review-devops"
 "qaOwners": null
 "service": null
 "upgradeableBranches": null
