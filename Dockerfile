@@ -1,4 +1,4 @@
-FROM docker-upgrade.artifactory.build.upgrade.com/go-builder-2023:2.0.20250527.1-31.1.24.2-179 as build
+FROM docker-upgrade.artifactory.build.upgrade.com/go-builder-2023:2.0.20250603.0-32.1.24.2-180 as build
 
 WORKDIR /go/src/github.com/abutaha/aws-es-proxy
 COPY --chown=upgrade:upgrade . .
