@@ -5,7 +5,7 @@ COPY --chown=upgrade:upgrade . .
 
 RUN go build -o aws-es-proxy
 
-FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/container-base-2023:20251004101543-04b7a9a8
+FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/container-base-2023:20251015100553-1fce4df8
 LABEL name="aws-es-proxy"
 
 COPY --from=build /go/src/github.com/abutaha/aws-es-proxy/aws-es-proxy /usr/local/bin/
