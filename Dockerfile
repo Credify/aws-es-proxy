@@ -1,11 +1,11 @@
-FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/go-builder-2023:20260206160855-98230af9 as build
+FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/go-builder-2023:20260210210507-c71a523b as build
 
 WORKDIR /go/src/github.com/abutaha/aws-es-proxy
 COPY --chown=upgrade:upgrade . .
 
 RUN go build -o aws-es-proxy
 
-FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/container-base-2023:20260127201708-9d58a6c1
+FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/container-base-2023:20260210100722-47fe3bb5
 LABEL name="aws-es-proxy"
 
 COPY --from=build /go/src/github.com/abutaha/aws-es-proxy/aws-es-proxy /usr/local/bin/
