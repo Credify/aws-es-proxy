@@ -1,4 +1,4 @@
-FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/go-builder-2023:20260210210507-c71a523b as build
+FROM 118455887602.dkr.ecr.us-west-2.amazonaws.com/releases/images/go-builder-2023:20260211134251-af4a0f60 as build
 
 WORKDIR /go/src/github.com/abutaha/aws-es-proxy
 COPY --chown=upgrade:upgrade . .
